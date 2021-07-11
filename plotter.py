@@ -107,6 +107,8 @@ class PlotWidget(QWidget):
         vlayout.addLayout(input_layout2)
         self.setLayout(vlayout)
 
+        self.error_dialog = QMessageBox()
+        self.error_dialog.setFont(QFont("Helvetica", 12))
         # connect inputs with on_change method
         self.mn.valueChanged.connect(lambda _: self.on_change(1))
         self.mx.valueChanged.connect(lambda _: self.on_change(2))
@@ -123,32 +125,26 @@ class PlotWidget(QWidget):
         # warning: min x can't be greater than or equal to max x
         if idx == 1 and mn >= mx:
             self.mn.setValue(mx-1)
-            error_dialog = QMessageBox()
-            error_dialog.setFont(QFont("Helvetica", 12))
-            error_dialog.setWindowTitle("x limits Error!")
-            error_dialog.setText("'min x' should be less than 'max x'.")
-            error_dialog.exec_()
+            self.error_dialog.setWindowTitle("x limits Error!")
+            self.error_dialog.setText("'min x' should be less than 'max x'.")
+            self.error_dialog.show()
             return
 
         # warning: max x can't be less than or equal to min x
         if idx == 2 and mx <= mn:
             self.mx.setValue(mn+1)
-            error_dialog = QMessageBox()
-            error_dialog.setFont(QFont("Helvetica", 12))
-            error_dialog.setWindowTitle("x limits Error!")
-            error_dialog.setText("'max x' should be greater than 'min x'.")
-            error_dialog.exec_()
+            self.error_dialog.setWindowTitle("x limits Error!")
+            self.error_dialog.setText("'max x' should be greater than 'min x'.")
+            self.error_dialog.show()
             return
 
         x = np.linspace(mn, mx)
         try:
             y = string2func(self.function.text())(x)
         except ValueError as e:
-            error_dialog = QMessageBox()
-            error_dialog.setFont(QFont("Helvetica", 12))
-            error_dialog.setWindowTitle("Function Error!")
-            error_dialog.setText(str(e))
-            error_dialog.exec_()
+            self.error_dialog.setWindowTitle("Function Error!")
+            self.error_dialog.setText(str(e))
+            self.error_dialog.show()
             return
 
         self.axes.clear()
