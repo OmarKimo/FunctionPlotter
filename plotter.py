@@ -44,6 +44,11 @@ replacements = {
     '^': '**',
 }
 
+DEFAULT_FONT = QFont("Calibri", 15)
+X_RANGE = (-1000, 1000)
+DEFAULT_FUNCTION = "x"
+DEFAULT_RANGE = (-10,10)
+
 # convert from string to mathematical expression that supported by matplotlib
 def string2func(string):
     ''' evaluates the string and returns a function of x '''
@@ -56,6 +61,10 @@ def string2func(string):
 
     for old, new in replacements.items():
         string = string.replace(old, new)
+
+    # to deal with constant functions e.g., y = 1
+    if "x" not in string:
+        string = f"{string}+0*x"
 
     def func(x):
         return eval(string)
@@ -81,15 +90,20 @@ class PlotWidget(QWidget):
         self.mx = QDoubleSpinBox()
         self.mn.setPrefix("min x: ")
         self.mx.setPrefix("max x: ")
-        self.mn.setRange(-1000, 1000)
-        self.mx.setRange(-1000, 1000)
-        self.mn.setValue(-10)
-        self.mx.setValue(10)
+        self.mn.setFont(DEFAULT_FONT) 
+        self.mx.setFont(DEFAULT_FONT) 
+        self.mn.setRange(*X_RANGE)
+        self.mx.setRange(*X_RANGE)
+        self.mn.setValue(DEFAULT_RANGE[0])
+        self.mx.setValue(DEFAULT_RANGE[1])
 
         self.function = QLineEdit()
-        self.function.setText("x")
+        self.function.setFont(DEFAULT_FONT) 
+        self.function.setText(DEFAULT_FUNCTION)
         self.func_label = QLabel(text="Function: ")
+        self.func_label.setFont(DEFAULT_FONT) 
         self.submit = QPushButton(text="plot")
+        self.submit.setFont(DEFAULT_FONT)
         #  Create layout
         input_layout1 = QHBoxLayout()
         input_layout1.addWidget(self.func_label)
@@ -108,7 +122,7 @@ class PlotWidget(QWidget):
         self.setLayout(vlayout)
 
         self.error_dialog = QMessageBox()
-        self.error_dialog.setFont(QFont("Helvetica", 12))
+        self.error_dialog.setFont(DEFAULT_FONT)
         # connect inputs with on_change method
         self.mn.valueChanged.connect(lambda _: self.on_change(1))
         self.mx.valueChanged.connect(lambda _: self.on_change(2))

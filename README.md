@@ -8,6 +8,8 @@
 
 ![working function](/screenshots/img3.png)
 
+![constant function](screenshots/img6.png)
+
 ### Wrong Examples
 
 ![Function error](/screenshots/img2.png)
